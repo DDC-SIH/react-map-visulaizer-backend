@@ -97,7 +97,20 @@ router.post('/search', async (req, res) => {
 
     try {
         const data = await dynamoDb.scan(params).promise();
-        res.json(data.Items);
+        const items = data.Items || [];
+
+        if (items.length === 0) {
+            return res.json([]);
+        }
+
+        const commonAttributes = Object.keys(items[0]).reduce((acc: { [key: string]: any }, key) => {
+            if (items.every(item => item[key] === items[0][key])) {
+                acc[key] = items[0][key];
+            }
+            return acc;
+        }, {});
+
+        res.json({ items, commonAttributes });
     } catch (error: any) {
         res.status(500).json({ error: 'Could not search items: ' + error.message });
     }
