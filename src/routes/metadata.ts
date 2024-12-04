@@ -56,7 +56,7 @@ router.post('/grouped', async (req, res) => {
             const standard = parts[4];
             const version = parts[5].substring(1, 3);
 
-            const groupName = `${prefix}${dataProcessingLevel}${standard}`;
+            const groupName = `${prefix}_${dataProcessingLevel}_${standard}`;
             const dateTime = new Date(`${captureDate} ${captureTime.slice(0, 2)}:${captureTime.slice(2)}`);
 
             if (!acc[groupName]) {
