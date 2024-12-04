@@ -9,6 +9,7 @@ import path from 'path';
 import userRoutes from './routes/users';
 import authRoutes from './routes/auth';
 import uploadRoutes from './routes/upload';
+import metadataRoutes from './routes/metadata';
 
 // AWS Configuration
 AWS.config.update({
@@ -36,6 +37,7 @@ app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/files", metadataRoutes);
 
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
