@@ -138,7 +138,6 @@ router.post('/deep-search', async (req, res) => {
             const captureDate = parts[1];
             const captureTime = parts[2];
             const dateTime = new Date(`${captureDate} ${captureTime.slice(0, 2)}:${captureTime.slice(2)}`);
-            console.log(dateTime, new Date(startDate), new Date(endDate));
             return dateTime >= new Date(startDate) && dateTime <= new Date(endDate);
         });
 
