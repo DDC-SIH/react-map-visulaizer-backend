@@ -54,7 +54,7 @@ router.post('/grouped', async (req, res) => {
             const captureTime = parts[2];
             const dataProcessingLevel = parts[3];
             const standard = parts[4];
-            const version = parts[5].substring(1, 3);
+            const version = parts[parts.length-1].substring(1, 3);
 
             const groupName = `${prefix}_${dataProcessingLevel}_${standard}`;
             const dateTime = new Date(`${captureDate} ${captureTime.slice(0, 2)}:${captureTime.slice(2)}`);
