@@ -86,7 +86,7 @@ router.post('/search', async (req, res) => {
     const { prefix, dataProcessingLevel, standard, version } = req.body;
     const params = {
         TableName: 'Files',
-        FilterExpression: 'contains(HDF_Product_File_Name, :prefix) and contains(HDF_Product_File_Name, :dataProcessingLevel) and contains(HDF_Product_File_Name, :standard and contains(HDF_Product_File_Name, :version)',
+        FilterExpression: 'contains(HDF_Product_File_Name, :prefix) and contains(HDF_Product_File_Name, :dataProcessingLevel) and contains(HDF_Product_File_Name, :standard) and contains(HDF_Product_File_Name, :version)',
         ExpressionAttributeValues: {
             ':prefix': prefix,
             ':dataProcessingLevel': dataProcessingLevel,
