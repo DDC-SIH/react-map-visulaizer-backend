@@ -116,6 +116,47 @@ router.post('/search', async (req, res) => {
     }
 });
 
+router.post('/deep-search', async (req, res) => {
+    const { prefix, dataProcessingLevel, standard, version, startDate, endDate } = req.body;
+    const params = {
+        TableName: 'Files',
+        FilterExpression: 'contains(HDF_Product_File_Name, :prefix) and contains(HDF_Product_File_Name, :dataProcessingLevel) and contains(HDF_Product_File_Name, :standard) and contains(HDF_Product_File_Name, :version)',
+        ExpressionAttributeValues: {
+            ':prefix': prefix,
+            ':dataProcessingLevel': dataProcessingLevel,
+            ':standard': standard,
+            ':version': version
+        }
+    };
 
+    try {
+        const data = await dynamoDb.scan(params).promise();
+        const items = data.Items || [];
+
+        const filteredItems = items.filter(item => {
+            const parts = item.HDF_Product_File_Name.split('_');
+            const captureDate = parts[1];
+            const captureTime = parts[2];
+            const dateTime = new Date(`${captureDate} ${captureTime.slice(0, 2)}:${captureTime.slice(2)}`);
+            console.log(dateTime, new Date(startDate), new Date(endDate));
+            return dateTime >= new Date(startDate) && dateTime <= new Date(endDate);
+        });
+
+        if (filteredItems.length === 0) {
+            return res.json([]);
+        }
+
+        const commonAttributes = Object.keys(filteredItems[0]).reduce((acc: { [key: string]: any }, key) => {
+            if (filteredItems.every(item => item[key] === filteredItems[0][key])) {
+                acc[key] = filteredItems[0][key];
+            }
+            return acc;
+        }, {});
+
+        res.json({ items: filteredItems, commonAttributes });
+    } catch (error: any) {
+        res.status(500).json({ error: 'Could not search items: ' + error.message });
+    }
+});
 
 export default router;
