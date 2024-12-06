@@ -35,7 +35,7 @@ router.post(
           .json({ message: "User with the provided email already exists" });
       }
 
-      await createUser({ email, password, firstName, lastName });
+      await createUser({ email, password, firstName, lastName, isAuthorized: false });
 
       const token = jwt.sign(
         { userId: email },

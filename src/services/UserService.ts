@@ -14,6 +14,7 @@ export interface UserType {
   password: string;
   firstName: string;
   lastName: string;
+  isAuthorized?: boolean;
 }
 
 export async function createUser(user: UserType): Promise<void> {
@@ -26,6 +27,7 @@ export async function createUser(user: UserType): Promise<void> {
       password: hashedPassword,
       firstName: user.firstName,
       lastName: user.lastName,
+      isAuthorized: user.isAuthorized || false,
     },
     Key: { userId: user.email },
   };

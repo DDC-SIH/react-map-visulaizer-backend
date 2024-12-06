@@ -3,6 +3,10 @@ import AWS from 'aws-sdk';
 
 const router = express.Router();
 const dynamoDb = new AWS.DynamoDB.DocumentClient();
+function getMonthShortName(month: string): string {
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    return monthNames[parseInt(month, 10) - 1];
+}
 
 router.get('/', async (req, res) => {
     const params = {
@@ -118,6 +122,7 @@ router.post('/search', async (req, res) => {
 
 router.post('/deep-search', async (req, res) => {
     const { prefix, dataProcessingLevel, standard, version, startDate, endDate } = req.body;
+    console.log(req.body)
     const params = {
         TableName: 'Files',
         FilterExpression: 'contains(HDF_Product_File_Name, :prefix) and contains(HDF_Product_File_Name, :dataProcessingLevel) and contains(HDF_Product_File_Name, :standard) and contains(HDF_Product_File_Name, :version)',
@@ -132,27 +137,32 @@ router.post('/deep-search', async (req, res) => {
     try {
         const data = await dynamoDb.scan(params).promise();
         const items = data.Items || [];
-
         const filteredItems = items.filter(item => {
             const parts = item.HDF_Product_File_Name.split('_');
+            console.log(item.HDF_Product_File_Name)
             const captureDate = parts[1];
             const captureTime = parts[2];
             const dateTime = new Date(`${captureDate} ${captureTime.slice(0, 2)}:${captureTime.slice(2)}`);
-            return dateTime >= new Date(startDate) && dateTime <= new Date(endDate);
+
+            const newStartDateTime  = `${startDate.slice(6,8)}${getMonthShortName(startDate.slice(4,6))}${startDate.slice(0,4)} ${startDate.slice(8,10)}:${startDate.slice(10,12)}`
+            const newEndDateTime = `${endDate.slice(6,8)}${getMonthShortName(endDate.slice(4,6))}${endDate.slice(0,4)} ${endDate.slice(8,10)}:${endDate.slice(10,12)}`
+            
+            
+            return dateTime >= new Date(`${newStartDateTime}`) && dateTime <= new Date(newEndDateTime);
         });
 
         if (filteredItems.length === 0) {
+            console.log("empty")
             return res.json([]);
         }
 
-        const commonAttributes = Object.keys(filteredItems[0]).reduce((acc: { [key: string]: any }, key) => {
-            if (filteredItems.every(item => item[key] === filteredItems[0][key])) {
-                acc[key] = filteredItems[0][key];
-            }
-            return acc;
-        }, {});
-
-        res.json({ items: filteredItems, commonAttributes });
+        // const commonAttributes = Object.keys(filteredItems[0]).reduce((acc: { [key: string]: any }, key) => {
+        //     if (filteredItems.every(item => item[key] === filteredItems[0][key])) {
+        //         acc[key] = filteredItems[0][key];
+        //     }
+        //     return acc;
+        // }, {});
+        res.json(filteredItems);
     } catch (error: any) {
         res.status(500).json({ error: 'Could not search items: ' + error.message });
     }
