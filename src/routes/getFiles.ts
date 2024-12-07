@@ -148,4 +148,40 @@ router.post("/searchWithTime", async (req, res) => {
   }
 });
 
+router.post("/getItem", async (req, res) => {
+  const { processingLevel, dateTime } = req.body;
+  
+  const dateObj = new Date(dateTime);
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  const month = dateObj.toLocaleString('default', { month: 'short' }).toUpperCase();
+  const year = dateObj.getFullYear();
+  const date = `${day}${month}${year}`;
+  const time = new Date(dateTime).toLocaleTimeString('en-GB', { hour12: false }).replace(":", "").slice(0, 4);
+  console.log(date, time);
+  const params = {
+    TableName: processingLevel,
+    Key: {
+      date,
+    },
+  };
+  
+  try {
+    const data = await dynamoDb.get(params).promise();
+    if (data.Item) {
+      const item = data.Item;
+      const timeEntry = item.time.find((entry: any) => entry[time]);
+      if (timeEntry) {
+        res.json(timeEntry[time]);
+      } else {
+        res.status(404).json({ error: "Time entry not found" });
+      }
+    } else {
+      res.status(404).json({ error: "Item not found" });
+    }
+  } catch (error: any) {
+    res.status(500).json({ error: "Could not load item: " + error.message });
+  }
+});
+
+
 export default router;
