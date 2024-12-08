@@ -20,6 +20,8 @@ AWS.config.update({
 });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();  
+process.env.AWS_SDK_LOAD_CONFIG = '1'; // Suppress AWS SDK warnings
+process.emitWarning = () => {}; // Suppress all warnings
 
 const app = express();
 const PORT = process.env.PORT || 7000;

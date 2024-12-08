@@ -35,7 +35,13 @@ router.post(
           .json({ message: "User with the provided email already exists" });
       }
 
-      await createUser({ email, password, firstName, lastName, isAuthorized: false });
+      await createUser({
+        email,
+        password,
+        firstName,
+        lastName,
+        isAuthorized: false,
+      });
 
       const token = jwt.sign(
         { userId: email },
@@ -48,13 +54,11 @@ router.post(
         secure: process.env.NODE_ENV === "production",
         maxAge: 86400000,
       });
-      return res
-        .status(200)
-        .json({
-          userId: email,
-          token,
-          message: "User Registered successfully",
-        });
+      return res.status(200).json({
+        userId: email,
+        token,
+        message: "User Registered successfully",
+      });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Something is wrong" });
@@ -68,7 +72,7 @@ router.get("/me", verifyToken, async (req: Request, res: Response) => {
   try {
     const params = {
       TableName: "User",
-      Key: { userId: userId }
+      Key: { userId: userId },
     };
 
     const result = await dynamoDb.get(params).promise();
@@ -83,4 +87,51 @@ router.get("/me", verifyToken, async (req: Request, res: Response) => {
     res.status(500).json({ message: "Something went wrong" });
   }
 });
+
+router.post(
+  "/addDownload",
+  verifyToken,
+  async (req: Request, res: Response) => {
+    const userId = req.userId;
+    const { downloadObject } = req.body;
+
+    if (!downloadObject) {
+      return res.status(400).json({ message: "downloadObject is required" });
+    }
+
+    try {
+      const params = {
+        TableName: "User",
+        Key: { userId },
+        UpdateExpression:
+          "SET #downloads = list_append(if_not_exists(#downloads, :empty_list), :download)",
+        ExpressionAttributeNames: {
+          "#downloads": "downloads", 
+        },
+        ExpressionAttributeValues: {
+          ":download": [
+            {
+              downloadDateTime: new Date().toISOString(), 
+              isAuthorized: false,
+              downloadObject,
+            },
+          ],
+          ":empty_list": [], 
+        },
+        ReturnValues: "UPDATED_NEW", 
+      };
+
+      const result = await dynamoDb.update(params).promise();
+
+      res.json({
+        message: "Download added successfully",
+        updatedDownloads: result.Attributes?.downloads,
+      });
+    } catch (error) {
+      console.error("Error adding download:", error);
+      res.status(500).json({ message: "Something went wrong", error });
+    }
+  }
+);
+
 export default router;
