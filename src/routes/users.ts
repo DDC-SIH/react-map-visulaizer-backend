@@ -67,14 +67,8 @@ router.get("/me", verifyToken, async (req: Request, res: Response) => {
 
   try {
     const params = {
-      TableName: "Users",
-      Key: { userId: userId },
-      ProjectionExpression: "#attr1, #attr2, #attr3", // List only the attributes you want, excluding sensitive data
-      ExpressionAttributeNames: {
-        "#attr1": "username", // Replace with actual attribute names
-        "#attr2": "email",
-        "#attr3": "createdAt",
-      },
+      TableName: "User",
+      Key: { userId: userId }
     };
 
     const result = await dynamoDb.get(params).promise();
