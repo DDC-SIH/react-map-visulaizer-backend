@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import AWS from 'aws-sdk';
@@ -20,9 +20,32 @@ AWS.config.update({
 });
 
 const dynamoDb = new AWS.DynamoDB.DocumentClient();  
+process.env.AWS_SDK_LOAD_CONFIG = '1'; // Suppress AWS SDK warnings
+process.emitWarning = () => {}; // Suppress all warnings
 
 const app = express();
 const PORT = process.env.PORT || 7000;
+
+// Middleware to log requests and responses
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const startTime = Date.now();
+  const skipLogging = ['/api/auth/validate-token', '/validate-token'];
+
+  if (!skipLogging.includes(req.url)) {
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  }
+
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    if (!skipLogging.includes(req.url)) {
+      console.log(
+        `[${new Date().toISOString()}] ${req.method} ${req.url} - ${res.statusCode} (${duration}ms)`
+      );
+    }
+  });
+
+  next();
+});
 
 app.use(cookieParser());
 app.use(express.json());
