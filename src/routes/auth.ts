@@ -48,11 +48,12 @@ router.post(
 
 
 router.get("/validate-token", verifyToken, (req: Request, res: Response) => {
-  // if (req.userId === process.env.SUPER_ADMIN_USER_ID) {
-  //   res.status(200).send({ userId: req.userId, isAdmin: true });
-  // } else {
-    res.status(200).send({ userId: req.userId });
-  // }
+  const adminEmails = (process.env.ADMIN_EMAIL || '').split(',');
+  if (adminEmails.includes(req.userId)) {
+    res.status(200).send({ userId: req.userId, isAdmin: true, isAuthorized: req.isAuthorized  });
+  } else {
+    res.status(200).send({ userId: req.userId, isAdmin: false, isAuthorized: req.isAuthorized  });
+  }
 });
 
 
