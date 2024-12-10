@@ -13,6 +13,7 @@ import metadataRoutes from './routes/metadata';
 import getFilesRoutes from './routes/getFiles';
 import authorizeRoutes from './routes/authorize';
 import apiKeysRouter from './routes/apiKeysRouter';
+import hdfUploadRouter from './routes/hdf5uploadrouter';
 
 // AWS Configuration
 AWS.config.update({
@@ -67,6 +68,7 @@ app.use("/api/files", metadataRoutes);
 app.use("/api/get-files", getFilesRoutes);
 app.use("/api/authorize", authorizeRoutes);
 app.use('/api/keys', apiKeysRouter);
+app.use('/api/hdf', hdfUploadRouter);
 
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
