@@ -72,6 +72,8 @@ const corsOptions: CorsOptions = {
   credentials: true, // Allow cookies or authorization headers
 };
 
+app.use(cors(corsOptions));
+
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
 // Routes
