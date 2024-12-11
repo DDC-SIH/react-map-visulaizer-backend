@@ -53,6 +53,10 @@ const corsOptions: cors.CorsOptions = {
 
 // Use CORS middleware
 app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
