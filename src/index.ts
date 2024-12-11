@@ -28,24 +28,30 @@ process.emitWarning = () => {}; // Suppress all warnings
 
 const app = express();
 const PORT = process.env.PORT || 7000;
+
+// Log the environment variables for debugging
+console.log('FRONTEND_URL_LOCAL:', process.env.FRONTEND_URL_LOCAL);
+console.log('FRONTEND_URL_PROD:', process.env.FRONTEND_URL_PROD);
+
 // Allow specific origins
-const allowedOrigins: string[] = [
-  'http://localhost:5173',
-  'http://65.0.176.251',
+const allowedOrigins = [
+  process.env.FRONTEND_URL_LOCAL,
+  process.env.FRONTEND_URL_PROD,
 ];
 
-// CORS Options
-const corsOptions: CorsOptions = {
+const corsOptions: cors.CorsOptions = {
   origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true); // Allow request
-      } else {
-          callback(new Error('Not allowed by CORS')); // Deny request
-      }
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error(`Origin ${origin} not allowed by CORS`));
+    }
   },
-  credentials: true, // Allow cookies or authorization headers
+  credentials: true, // Enable credentials if needed
+  methods: 'GET,POST,PUT,DELETE,OPTIONS',
 };
 
+// Use CORS middleware
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
