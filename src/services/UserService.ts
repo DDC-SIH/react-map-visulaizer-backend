@@ -3,7 +3,7 @@ import AWS from 'aws-sdk';
 import bcrypt from 'bcryptjs';
 
 AWS.config.update({
-  region: process.env.AWS_REGION || 'us-east-2', 
+  region: process.env.AWS_REGION || 'ap-south-1', 
 });
 
 const dynamodb = new AWS.DynamoDB.DocumentClient();

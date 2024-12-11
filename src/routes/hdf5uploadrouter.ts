@@ -23,7 +23,7 @@ router.get("/presigned-url", async (req: Request, res: Response) => {
 
   const params = {
     Bucket: process.env.HDF_S3_BUCKET_NAME as string || 'kdg-raw' ,
-    Key: `uploads/${fileName}`,
+    Key: `${fileName}`,
     Expires: 3600,
     ContentType: 'application/octet-stream',
   };
@@ -47,7 +47,7 @@ router.post("/multipart-upload", upload.single("file"), async (req: Request, res
 
   const uploadParams = {
     Bucket: process.env.HDF_S3_BUCKET_NAME || 'kdg-raw',
-    Key: encodeURIComponent(`uploads/${file.originalname}`),
+    Key: encodeURIComponent(`${file.originalname}`),
     ContentType: "application/x-hdf",
   };
 
