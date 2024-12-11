@@ -1,5 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
-import cors from 'cors';
+import cors, { CorsOptions } from 'cors';
 import 'dotenv/config';
 import AWS from 'aws-sdk';
 import cookieParser from 'cookie-parser';
@@ -53,8 +53,24 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ origin: '*', credentials: true }));
 
+// Allow specific origins
+const allowedOrigins: string[] = [
+  'http://localhost:5173',
+  'http://65.0.176.251',
+];
+
+// CORS Options
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true); // Allow request
+      } else {
+          callback(new Error('Not allowed by CORS')); // Deny request
+      }
+  },
+  credentials: true, // Allow cookies or authorization headers
+};
 
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
