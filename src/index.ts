@@ -28,6 +28,28 @@ process.emitWarning = () => {}; // Suppress all warnings
 
 const app = express();
 const PORT = process.env.PORT || 7000;
+// Allow specific origins
+const allowedOrigins: string[] = [
+  'http://localhost:5173',
+  'http://65.0.176.251',
+];
+
+// CORS Options
+const corsOptions: CorsOptions = {
+  origin: (origin, callback) => {
+      if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true); // Allow request
+      } else {
+          callback(new Error('Not allowed by CORS')); // Deny request
+      }
+  },
+  credentials: true, // Allow cookies or authorization headers
+};
+
+app.use(cors(corsOptions));
+app.use(cookieParser());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Middleware to log requests and responses
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -50,29 +72,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-app.use(cookieParser());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
-// Allow specific origins
-const allowedOrigins: string[] = [
-  'http://localhost:5173',
-  'http://65.0.176.251',
-];
-
-// CORS Options
-const corsOptions: CorsOptions = {
-  origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
-          callback(null, true); // Allow request
-      } else {
-          callback(new Error('Not allowed by CORS')); // Deny request
-      }
-  },
-  credentials: true, // Allow cookies or authorization headers
-};
-
-app.use(cors(corsOptions));
 
 app.use(express.static(path.join(__dirname, "../../frontend/dist")));
 
