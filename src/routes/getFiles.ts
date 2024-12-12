@@ -106,8 +106,9 @@ router.post("/searchWithTime", async (req, res) => {
       .json({ error: "startDate must be less than or equal to endDate" });
   }
 
+  const tableName = processingLevel === "L1C" ? "L1C_SAVED" : processingLevel;
   const params = {
-    TableName: processingLevel,
+    TableName: tableName,
   };
 
   try {
