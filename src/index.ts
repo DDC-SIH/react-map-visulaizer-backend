@@ -14,6 +14,7 @@ import getFilesRoutes from './routes/getFiles';
 import authorizeRoutes from './routes/authorize';
 import apiKeysRouter from './routes/apiKeysRouter';
 import hdfUploadRouter from './routes/hdf5uploadrouter';
+import uploadPlayground from './routes/uploadPlayground';
 
 // AWS Configuration
 AWS.config.update({
@@ -95,6 +96,7 @@ app.use("/api/get-files", getFilesRoutes);
 app.use("/api/authorize", authorizeRoutes);
 app.use('/api/keys', apiKeysRouter);
 app.use('/api/hdf', hdfUploadRouter);
+app.use('/api/upload-tif', uploadPlayground);
 
 app.get("*", (req: Request, res: Response) => {
   res.sendFile(path.join(__dirname, "../../frontend/dist/index.html"));
