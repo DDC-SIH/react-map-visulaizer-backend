@@ -38,6 +38,7 @@ console.log('FRONTEND_URL_PROD:', process.env.FRONTEND_URL_PROD);
 const allowedOrigins = [
   process.env.FRONTEND_URL_LOCAL,
   process.env.FRONTEND_URL_PROD,
+  process.env.FRONTEND_URL_PROD2,
 ];
 
 const corsOptions: cors.CorsOptions = {
