@@ -33,12 +33,15 @@ const PORT = process.env.PORT || 7000;
 // Log the environment variables for debugging
 console.log('FRONTEND_URL_LOCAL:', process.env.FRONTEND_URL_LOCAL);
 console.log('FRONTEND_URL_PROD:', process.env.FRONTEND_URL_PROD);
+console.log('FRONTEND_URL_PROD 2:', process.env.FRONTEND_URL_PROD2);
+console.log('FRONTEND_URL_PROD 3:', process.env.FRONTEND_URL_PROD3);
 
 // Allow specific origins
 const allowedOrigins = [
   process.env.FRONTEND_URL_LOCAL,
   process.env.FRONTEND_URL_PROD,
   process.env.FRONTEND_URL_PROD2,
+  process.env.FRONTEND_URL_PROD3,
 ];
 
 const corsOptions: cors.CorsOptions = {
@@ -46,6 +49,7 @@ const corsOptions: cors.CorsOptions = {
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.log('Origin not allowed by CORS:', origin);
       callback(new Error(`Origin ${origin} not allowed by CORS`));
     }
   },
